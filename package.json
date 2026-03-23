@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy": "ng build --configuration production --base-href \"/Informes-Psicologicos/\" && npx angular-cli-ghpages --dir=dist/syracusa-angular/browser"
   },
   "private": true,
   "packageManager": "npm@11.9.0",
@@ -29,6 +30,7 @@
     "@angular/cli": "^21.2.2",
     "@angular/compiler-cli": "^21.2.0",
     "@tailwindcss/typography": "^0.5.19",
+    "angular-cli-ghpages": "^3.0.2",
     "autoprefixer": "^10.4.27",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.8",
