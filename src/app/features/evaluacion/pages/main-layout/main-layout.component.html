@@ -1,0 +1,51 @@
+<div class="layout-wrapper">
+
+  <!-- Mobile overlay -->
+  @if (mobileSidebarOpen()) {
+    <div class="mobile-overlay" (click)="closeMobileSidebar()"></div>
+  }
+
+  <!-- Desktop sidebar -->
+  <aside class="sidebar-desktop" [class.sidebar-desktop--collapsed]="sidebarCollapsed()">
+    <app-sidebar
+      [collapsed]="sidebarCollapsed()"
+      (closeMobile)="closeMobileSidebar()"
+    />
+  </aside>
+
+  <!-- Mobile sidebar -->
+  <aside class="sidebar-mobile" [class.sidebar-mobile--open]="mobileSidebarOpen()">
+    <app-sidebar [collapsed]="false" (closeMobile)="closeMobileSidebar()" />
+  </aside>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="topbar-toggle desktop-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <button class="topbar-toggle mobile-toggle" (click)="openMobileSidebar()" aria-label="Open menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <span class="topbar-title">Sistema de Informes</span>
+    </header>
+
+    <!-- Page body -->
+    <main class="page-body">
+      @if (evalService.selectedExamen()?.tipo === 'evalua') {
+        <app-informe-evalua />
+      } @else {
+        <app-informe-evaluacion />
+      }
+    </main>
+
+  </div>
+</div>

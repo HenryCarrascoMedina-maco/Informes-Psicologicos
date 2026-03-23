@@ -1,0 +1,118 @@
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Desktop Sidebar ─────────────────────────────────── */
+.sidebar-desktop {
+  display: none;
+  flex-shrink: 0;
+  height: 100vh;
+  transition: width 0.25s ease;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+/* ── Mobile Sidebar ──────────────────────────────────── */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.sidebar-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+
+  &--open {
+    transform: translateX(0);
+  }
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* ── Main Content ────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f0f4f8;
+}
+
+/* ── Topbar ──────────────────────────────────────────── */
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.25rem;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.topbar-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.hamburger-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #475569;
+  border-radius: 2px;
+}
+
+.desktop-toggle {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+.mobile-toggle {
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* ── Page Body ───────────────────────────────────────── */
+.page-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}

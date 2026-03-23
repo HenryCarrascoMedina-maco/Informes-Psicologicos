@@ -1,0 +1,273 @@
+<!-- ═══════════════════════ FLOATING BUTTONS ═══════════════════════ -->
+<div class="floating-btns">
+  <button class="btn-float btn-preview" (click)="openPreview()" title="Vista previa del informe">
+    <i class="bi bi-eye me-1"></i>Vista previa
+  </button>
+  <button class="btn-float btn-download" (click)="downloadPdf()" [disabled]="pdfGenerating()" title="Descargar como PDF">
+    @if (pdfGenerating()) {
+      <i class="bi bi-hourglass me-1"></i>Generando...
+    } @else {
+      <i class="bi bi-download me-1"></i>Descarga
+    }
+  </button>
+</div>
+
+<!-- ═══════════════════════ PREVIEW MODAL ═══════════════════════ -->
+@if (previewOpen()) {
+  <div class="modal-overlay" (click)="previewOpen.set(false)">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+      <div class="modal-header-custom">
+        <span><i class="bi bi-file-earmark-pdf me-2"></i>Vista previa — Informe PDF</span>
+        <button class="modal-close" (click)="previewOpen.set(false)">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body-custom">
+        @for (url of previewImages(); track $index) {
+          <img [src]="url" class="preview-page-img" alt="Página {{ $index + 1 }}" />
+        }
+      </div>
+      <div class="modal-footer-custom">
+        <button class="btn-modal-close" (click)="previewOpen.set(false)">
+          <i class="bi bi-x me-1"></i>Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════ DOCUMENT ═══════════════════════ -->
+@if (examen(); as ex) {
+<div class="pagina" id="documento" #documento>
+
+  <!-- Header -->
+  <div class="cabecera-doc text-center">
+    <div class="nombre-header-meta">{{ ex.estudiante }}</div>
+    <h1>{{ ex.institucion }}</h1>
+    <h3>Informe de Evaluación &nbsp;·&nbsp;
+      <input type="text" class="input-area-titulo"
+             [ngModel]="ex.area"
+             (ngModelChange)="setField('area', $event)" />
+    </h3>
+  </div>
+
+  <!-- I. Datos de Filiación -->
+  <div class="seccion-titulo">
+    <span class="num">I.</span>
+    <span class="titulo">Datos de Filiación</span>
+  </div>
+
+  <table class="tabla-filiacion w100">
+    <tbody>
+      <tr>
+        <td>Apellidos y Nombres</td>
+        <td>: <input type="text" class="editable-field ef-nombre"
+               [ngModel]="ex.estudiante"
+               (ngModelChange)="setField('estudiante', $event)" />
+            <span class="edit-hint">✎</span></td>
+      </tr>
+      <tr>
+        <td>Edad</td>
+        <td>: <input type="text" class="editable-field ef-corto"
+               [ngModel]="ex.edad"
+               (ngModelChange)="setField('edad', $event)" /></td>
+      </tr>
+      <tr>
+        <td>Fecha de nacimiento</td>
+        <td>: <span class="fecha-input-wrap">
+               <input type="date" #fechaNacInput
+                      [value]="ex.fechaNacimiento"
+                      (change)="onFechaNacChange(fechaNacInput.value)"
+                      class="fecha-hidden-input" />
+               <span class="fecha-display" (click)="showPicker(fechaNacInput)">
+                 {{ formatFecha(ex.fechaNacimiento) }}
+               </span>
+               <button type="button" class="btn-fecha-pick no-pdf" (click)="showPicker(fechaNacInput)">
+                 <i class="bi bi-calendar3"></i>
+               </button>
+             </span></td>
+      </tr>
+      <tr>
+        <td>Escolaridad</td>
+        <td>: <input type="text" class="editable-field ef-medio"
+               [ngModel]="ex.escolaridad"
+               (ngModelChange)="setField('escolaridad', $event)" /></td>
+      </tr>
+      <tr>
+        <td>Institución Educativa</td>
+        <td>: <span class="ef-readonly">{{ ex.institucion }}</span></td>
+      </tr>
+      <tr>
+        <td>Fecha de Informe</td>
+        <td>: <span class="fecha-input-wrap">
+               <input type="date" #fechaInfInput
+                      [value]="ex.fechaInforme"
+                      (change)="setField('fechaInforme', fechaInfInput.value)"
+                      class="fecha-hidden-input" />
+               <span class="fecha-display" (click)="showPicker(fechaInfInput)">
+                 {{ formatFecha(ex.fechaInforme) }}
+               </span>
+               <button type="button" class="btn-fecha-pick no-pdf" (click)="showPicker(fechaInfInput)">
+                 <i class="bi bi-calendar3"></i>
+               </button>
+             </span></td>
+      </tr>
+      <tr>
+        <td>Especialista</td>
+        <td>: <span class="ef-readonly">{{ ex.especialista }}</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- II. Motivo de Evaluación -->
+  <div class="seccion-titulo">
+    <span class="num">II.</span>
+    <span class="titulo">Motivo de Evaluación</span>
+  </div>
+  <div #motivoDiv class="parrafo-body editable-block"
+       contenteditable="true" spellcheck="false"
+       (blur)="onMotivoBlur($any($event.target))"></div>
+
+  <!-- III. Observación de Conducta -->
+  <div class="seccion-titulo">
+    <span class="num">III.</span>
+    <span class="titulo">Observación de Conducta</span>
+  </div>
+  <div #observRef class="parrafo-body editable-block"
+       contenteditable="true" spellcheck="false"
+       (blur)="onObservacionBlur($any($event.target))"></div>
+
+  <!-- IV. Instrumentos -->
+  <div class="seccion-titulo">
+    <span class="num">IV.</span>
+    <span class="titulo">Instrumentos de Evaluación</span>
+  </div>
+  <ul class="lista-reco ms2">
+    @for (inst of ex.instrumentos; track $index) {
+      <li>{{ inst }}</li>
+    }
+  </ul>
+
+  <!-- V. Resultados -->
+  <div class="seccion-titulo" id="sec-resultados">
+    <span class="num">V.</span>
+    <span class="titulo">Resultados</span>
+  </div>
+
+  <div class="escala-card">
+    <div class="escala-titulo">📊 ESCALA DE INTERPRETACIÓN (BASE CLÍNICA)</div>
+    <div class="escala-filas">
+      <span class="escala-fila"><span class="nivel-badge nivel-adecuado">🟢 Desarrollo alto</span> 85% – 100%</span>
+      <span class="escala-fila"><span class="nivel-badge nivel-leve">🟡 Desarrollo promedio</span> 70% – 84%</span>
+      <span class="escala-fila"><span class="nivel-badge nivel-moderado">🟠 Desarrollo promedio bajo</span> 50% – 69%</span>
+      <span class="escala-fila"><span class="nivel-badge nivel-significativo">🔴 Desarrollo bajo</span> &lt;50%</span>
+    </div>
+  </div>
+
+  <div class="table-responsive mb4">
+    <table class="tabla-evalua">
+      <thead>
+        <tr>
+          <th class="th-cod">CÓD.</th>
+          <th class="th-area">ÁREA / SUBTEST</th>
+          <th>P. MÁXIMO</th>
+          <th>P. OBTENIDO</th>
+          <th>% RENDTO.</th>
+          <th>NIVEL</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of computedAreas(); track a.cod; let ai = $index) {
+          <!-- Area total row -->
+          <tr class="tr-area">
+            <td><strong>{{ a.cod }}</strong></td>
+            <td class="td-area-nombre">{{ a.nombre }}</td>
+            <td>{{ a.totalMax }}</td>
+            <td>{{ a.totalSujeto }}</td>
+            <td class="td-pct"><strong>{{ a.pct }}%</strong></td>
+            <td class="td-nivel">
+              <span class="nivel-badge {{ a.nivelInfo.cls }}">{{ a.nivelInfo.text }}</span>
+            </td>
+          </tr>
+          <!-- Submodule rows -->
+          @for (s of a.submodulos; track s.num; let si = $index) {
+            <tr class="tr-sub">
+              <td class="td-sub-cod">{{ a.cod }}.{{ s.num }}</td>
+              <td class="td-sub-nombre">{{ s.num }}. {{ s.nombre }}</td>
+              <td>
+                <input type="number" class="input-puntaje" [value]="s.max" min="0"
+                       (change)="onSubMaxChange(ai, si, $any($event.target).value)" />
+              </td>
+              <td>
+                <input type="number" class="input-puntaje" [value]="s.sujeto" min="0" [max]="s.max"
+                       (input)="onSubScoreChange(ai, si, $any($event.target).value)" />
+              </td>
+              <td class="td-pct">{{ s.pct }}%</td>
+              <td class="td-sub-nivel">—</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Narrativa por área -->
+  <div id="narrativa-resultados" class="narrativa-bloque">
+    @for (a of computedAreas(); track a.cod; let i = $index) {
+      <div class="narrativa-linea">
+        <span class="narrativa-dash">•</span>
+        <textarea class="narrativa-textarea"
+                  [value]="getSpeechDisplay(i, a)"
+                  (blur)="onSpeechEdit(a.cod, $any($event.target).value)"
+                  spellcheck="false"></textarea>
+      </div>
+    }
+  </div>
+
+  <!-- VI. Conclusiones -->
+  <div class="seccion-titulo" id="sec-conclusiones">
+    <span class="num">VI.</span>
+    <span class="titulo">Conclusiones</span>
+  </div>
+  <div #conclusionDiv class="parrafo-body editable-block"
+       contenteditable="true" spellcheck="false"
+       (blur)="onConclusionBlur($any($event.target))"></div>
+
+  <!-- VII. Recomendaciones -->
+  <div class="seccion-titulo">
+    <span class="num">VII.</span>
+    <span class="titulo">Recomendaciones</span>
+  </div>
+  <ul #recoGenEl class="lista-reco ms2 editable-block"
+      contenteditable="true" spellcheck="false"
+      (keydown)="onRecoKeydown($event)"></ul>
+
+  <p class="sub-titulo-reco"><i class="bi bi-house-heart me1"></i>Para la familia:</p>
+  <ul #recoFamEl class="lista-reco ms2 editable-block"
+      contenteditable="true" spellcheck="false"
+      (keydown)="onRecoKeydown($event)"></ul>
+
+  <p class="sub-titulo-reco"><i class="bi bi-building me1"></i>Para el colegio:</p>
+  <ul #recoColEl class="lista-reco ms2 editable-block"
+      contenteditable="true" spellcheck="false"
+      (keydown)="onRecoKeydown($event)"></ul>
+
+  <!-- Firma -->
+  <div class="firma-bloque">
+    <div class="firma-linea"></div>
+    <div class="firma-nombre">{{ ex.especialista }}</div>
+    <div class="firma-cargo">Psicóloga</div>
+    <div class="firma-cargo">{{ ex.licencia }}</div>
+  </div>
+
+  <!-- Pie de página -->
+  <div class="pie-pag">
+    Documento confidencial &nbsp;·&nbsp; {{ ex.institucion }} &nbsp;·&nbsp; Informe de Evaluación
+  </div>
+
+</div>
+} @else {
+  <div class="no-examen">
+    <p>Selecciona una evaluación en el panel lateral.</p>
+  </div>
+}

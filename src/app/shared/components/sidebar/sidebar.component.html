@@ -1,0 +1,29 @@
+<nav class="sidebar" [class.collapsed]="collapsed()">
+  <div class="sidebar-header">
+    @if (!collapsed()) {
+      <span class="sidebar-title">Evaluaciones</span>
+    }
+  </div>
+
+  <ul class="sidebar-menu">
+    @for (examen of evalService.examenes(); track examen.id) {
+      <li
+        class="sidebar-item"
+        [class.active]="evalService.selectedId() === examen.id"
+        (click)="selectExamen(examen.id)"
+        [title]="collapsed() ? examen.titulo : ''"
+      >
+        <span class="item-icon">📋</span>
+        @if (!collapsed()) {
+          <span class="item-label">{{ examen.titulo }}</span>
+        }
+      </li>
+    }
+  </ul>
+
+  <div class="sidebar-footer">
+    @if (!collapsed()) {
+      <span class="footer-brand">Syracusa</span>
+    }
+  </div>
+</nav>
