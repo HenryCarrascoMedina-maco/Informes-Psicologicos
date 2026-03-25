@@ -644,5 +644,4 @@
   font-size: 1rem;
 }
 
-/* ── No PDF ─────────────────────────────────────────────────── */
-.no-pdf { display: var(--no-pdf-display, inline-flex); }
+/* .no-pdf elements are hidden in PDF via JS (cloneForPdf removes them) — no CSS needed here */
