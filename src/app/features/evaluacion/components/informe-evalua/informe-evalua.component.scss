@@ -303,6 +303,7 @@
 }
 
 .ms2   { margin-left: .5rem; }
+.mb3   { margin-bottom: 1rem; }
 .mb4   { margin-bottom: 1.5rem; }
 .me1   { margin-right: .25rem; }
 
@@ -456,6 +457,97 @@
 .nivel-leve          { background: #fef9c3; color: #854d0e; }
 .nivel-moderado      { background: #ffedd5; color: #9a3412; }
 .nivel-significativo { background: #fee2e2; color: #991b1b; }
+
+/* ── Editable table name inputs ─────────────────────────────── */
+.input-area {
+  border: none;
+  border-bottom: 1.5px dashed #b5c5d8;
+  background: transparent;
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 700;
+  color: inherit;
+  outline: none;
+  padding: 2px 0;
+  width: 100%;
+  min-width: 110px;
+  transition: border-color .2s;
+
+  &:focus {
+    border-bottom: 2px solid var(--azul-med);
+    background: rgba(37,99,168,.07);
+    border-radius: 3px 3px 0 0;
+  }
+}
+
+.input-sub-nombre {
+  border: none;
+  border-bottom: 1px dashed #b5c5d8;
+  background: transparent;
+  font-family: inherit;
+  font-size: .82rem;
+  color: inherit;
+  outline: none;
+  padding: 2px 0;
+  width: calc(100% - 1.6rem);
+  min-width: 80px;
+  transition: border-color .2s;
+
+  &:focus {
+    border-bottom: 2px solid var(--azul-med);
+    background: rgba(37,99,168,.07);
+    border-radius: 3px 3px 0 0;
+  }
+}
+
+/* ── Table action buttons ───────────────────────────────────── */
+.td-delete { padding: .2rem !important; white-space: nowrap; }
+
+.btn-eliminar {
+  background: none;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: .75rem;
+  line-height: 1;
+  transition: background .15s, color .15s;
+
+  &:hover { background: #dc3545; color: #fff; }
+}
+
+.btn-agregar-sub {
+  background: none;
+  border: 1px solid var(--azul-med);
+  color: var(--azul-med);
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: .75rem;
+  margin-right: .25rem;
+  line-height: 1;
+  transition: background .15s, color .15s;
+
+  &:hover { background: var(--azul-med); color: #fff; }
+}
+
+.btn-agregar {
+  background: none;
+  border: 1px solid #0d6efd;
+  color: #0d6efd;
+  border-radius: 4px;
+  padding: .28rem .8rem;
+  font-size: .82rem;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  transition: background .15s, color .15s;
+
+  &:hover { background: #0d6efd; color: #fff; }
+}
 
 /* ── Area Title Editable Input ──────────────────────────────── */
 .input-area-titulo {

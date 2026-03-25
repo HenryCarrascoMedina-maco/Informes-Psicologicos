@@ -170,10 +170,11 @@
         <tr>
           <th class="th-cod">CÓD.</th>
           <th class="th-area">ÁREA / SUBTEST</th>
-          <th>P. MÁXIMO</th>
-          <th>P. OBTENIDO</th>
-          <th>% RENDTO.</th>
+          <th class="no-pdf">P. MÁXIMO</th>
+          <th class="no-pdf">P. OBTENIDO</th>
+          <th class="no-pdf">% RENDTO.</th>
           <th>NIVEL</th>
+          <th class="no-pdf" style="width:3.5rem;"></th>
         </tr>
       </thead>
       <tbody>
@@ -181,34 +182,62 @@
           <!-- Area total row -->
           <tr class="tr-area">
             <td><strong>{{ a.cod }}</strong></td>
-            <td class="td-area-nombre">{{ a.nombre }}</td>
-            <td>{{ a.totalMax }}</td>
-            <td>{{ a.totalSujeto }}</td>
-            <td class="td-pct"><strong>{{ a.pct }}%</strong></td>
+            <td class="td-area-nombre">
+              <input type="text" class="input-area"
+                     [value]="a.nombre"
+                     (change)="onAreaNameChange(ai, $any($event.target).value)" />
+            </td>
+            <td class="no-pdf">{{ a.totalMax }}</td>
+            <td class="no-pdf">{{ a.totalSujeto }}</td>
+            <td class="no-pdf td-pct"><strong>{{ a.pct }}%</strong></td>
             <td class="td-nivel">
               <span class="nivel-badge {{ a.nivelInfo.cls }}">{{ a.nivelInfo.text }}</span>
+            </td>
+            <td class="no-pdf td-delete">
+              <button class="btn-agregar-sub" (click)="addSubmodulo(ai)" title="Agregar subárea">
+                <i class="bi bi-plus"></i>
+              </button>
+              <button class="btn-eliminar" (click)="removeArea(ai)" title="Eliminar área">
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
           <!-- Submodule rows -->
           @for (s of a.submodulos; track s.num; let si = $index) {
             <tr class="tr-sub">
               <td class="td-sub-cod">{{ a.cod }}.{{ s.num }}</td>
-              <td class="td-sub-nombre">{{ s.num }}. {{ s.nombre }}</td>
-              <td>
+              <td class="td-sub-nombre">
+                {{ s.num }}.
+                <input type="text" class="input-sub-nombre"
+                       [value]="s.nombre"
+                       (change)="onSubNameChange(ai, si, $any($event.target).value)" />
+              </td>
+              <td class="no-pdf">
                 <input type="number" class="input-puntaje" [value]="s.max" min="0"
                        (change)="onSubMaxChange(ai, si, $any($event.target).value)" />
               </td>
-              <td>
+              <td class="no-pdf">
                 <input type="number" class="input-puntaje" [value]="s.sujeto" min="0" [max]="s.max"
                        (input)="onSubScoreChange(ai, si, $any($event.target).value)" />
               </td>
-              <td class="td-pct">{{ s.pct }}%</td>
+              <td class="no-pdf td-pct">{{ s.pct }}%</td>
               <td class="td-sub-nivel">—</td>
+              <td class="no-pdf td-delete">
+                <button class="btn-eliminar" (click)="removeSubmodulo(ai, si)" title="Eliminar subárea">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
             </tr>
           }
         }
       </tbody>
     </table>
+  </div>
+
+  <div class="no-pdf mb3">
+    <button class="btn-agregar" (click)="addArea()">
+      <i class="bi bi-plus-circle me1"></i>Agregar área
+    </button>
   </div>
 
   <!-- Narrativa por área -->

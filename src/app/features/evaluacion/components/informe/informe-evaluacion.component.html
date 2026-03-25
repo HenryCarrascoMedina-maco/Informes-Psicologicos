@@ -170,9 +170,9 @@
         <tr>
           <th>CÓD.</th>
           <th>ÁREAS</th>
-          <th>PUNTAJE MÁXIMO</th>
-          <th>PUNTAJE SUJETO</th>
-          <th>% RENDIMIENTO</th>
+          <th class="no-pdf">PUNTAJE MÁXIMO</th>
+          <th class="no-pdf">PUNTAJE SUJETO</th>
+          <th class="no-pdf">% RENDIMIENTO</th>
           <th>NIVEL</th>
           <th class="no-pdf" style="width:2.5rem;"></th>
         </tr>
@@ -186,17 +186,17 @@
                      [value]="r.area"
                      (change)="onAreaChange(i, $any($event.target).value)" />
             </td>
-            <td>
+            <td class="no-pdf">
               <input type="number" class="input-puntaje"
                      [value]="r.max" min="0"
                      (change)="onMaxChange(i, $any($event.target).value)" />
             </td>
-            <td>
+            <td class="no-pdf">
               <input type="number" class="input-puntaje"
                      [value]="r.sujeto" min="0" [max]="r.max"
                      (input)="onScoreChange(i, $any($event.target).value)" />
             </td>
-            <td class="td-pct"><strong>{{ r.pct }}%</strong></td>
+            <td class="no-pdf td-pct"><strong>{{ r.pct }}%</strong></td>
             <td class="td-nivel">
               <span class="nivel-emoji">{{ getNivelInfo(r.pct).emoji }}</span>
               {{ getNivelInfo(r.pct).text }}

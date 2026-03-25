@@ -268,6 +268,72 @@ export class InformeEvaluaComponent implements AfterViewInit {
     });
   }
 
+  onAreaNameChange(areaIndex: number, value: string): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map((a, ai) =>
+        ai === areaIndex ? { ...a, nombre: value.trim() || a.nombre } : a
+      );
+      return { ...ex, areas };
+    });
+  }
+
+  onSubNameChange(areaIndex: number, subIndex: number, value: string): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map((a, ai) =>
+        ai === areaIndex
+          ? { ...a, submodulos: a.submodulos.map((s, si) =>
+              si === subIndex ? { ...s, nombre: value.trim() || s.nombre } : s) }
+          : a
+      );
+      return { ...ex, areas };
+    });
+  }
+
+  addArea(): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const cod = String.fromCharCode(65 + (ex.areas.length % 26));
+      const newArea: AreaEvalua = {
+        cod,
+        nombre: 'Nueva Área',
+        submodulos: [{ num: 1, nombre: 'Subárea 1', max: 0, sujeto: 0 }],
+      };
+      return { ...ex, areas: [...ex.areas, newArea] };
+    });
+  }
+
+  addSubmodulo(areaIndex: number): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map((a, ai) => {
+        if (ai !== areaIndex) return a;
+        const nextNum = (a.submodulos[a.submodulos.length - 1]?.num ?? 0) + 1;
+        return { ...a, submodulos: [...a.submodulos, { num: nextNum, nombre: 'Nueva subárea', max: 0, sujeto: 0 }] };
+      });
+      return { ...ex, areas };
+    });
+  }
+
+  removeArea(areaIndex: number): void {
+    this.examen.update(ex =>
+      ex ? { ...ex, areas: ex.areas.filter((_, i) => i !== areaIndex) } : null
+    );
+  }
+
+  removeSubmodulo(areaIndex: number, subIndex: number): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map((a, ai) =>
+        ai === areaIndex
+          ? { ...a, submodulos: a.submodulos.filter((_, si) => si !== subIndex) }
+          : a
+      );
+      return { ...ex, areas };
+    });
+  }
+
   onMotivoBlur(el: HTMLElement): void {
     this.examen.update(ex => ex ? { ...ex, motivoEvaluacion: el.innerText.trim() } : null);
   }
