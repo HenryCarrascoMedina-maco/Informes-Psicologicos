@@ -1,6 +1,13 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { AnyExamen, NivelInfo, NivelClinico } from '../models/evaluation.model';
+import { AnyExamen, NivelInfo, NivelClinico, EscalaItem } from '../models/evaluation.model';
 import { EXAMENES_MOCK } from '../../data/examenes.mock';
+
+export const DEFAULT_ESCALA: EscalaItem[] = [
+  { label: 'Desarrollo alto',          cls: 'nivel-adecuado',      color: '#16a34a' },
+  { label: 'Desarrollo promedio',      cls: 'nivel-leve',          color: '#ca8a04' },
+  { label: 'Desarrollo promedio bajo', cls: 'nivel-moderado',      color: '#ea580c' },
+  { label: 'Desarrollo bajo',          cls: 'nivel-significativo', color: '#dc2626' },
+];
 
 @Injectable({ providedIn: 'root' })
 export class EvaluationService {

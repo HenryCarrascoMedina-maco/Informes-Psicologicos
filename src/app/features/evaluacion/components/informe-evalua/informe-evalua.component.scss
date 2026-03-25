@@ -342,6 +342,42 @@
   margin-bottom: .2rem;
 }
 
+/* ── Editable scale label input (inside the badge) ─────────── */
+.escala-input-label {
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  outline: none;
+  padding: 0;
+  width: auto;
+  min-width: 60px;
+  max-width: 200px;
+  border-bottom: 1px dashed currentColor;
+  cursor: text;
+
+  &:focus { background: rgba(255,255,255,.25); border-radius: 2px; }
+}
+
+/* The label visible only in PDF (hidden in edit mode via JS) */
+.escala-label-pdf { display: none; }
+
+/* ── Nivel select dropdown ──────────────────────────────────── */
+.select-nivel {
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  background: #fff;
+  font-family: inherit;
+  font-size: .78rem;
+  color: var(--azul);
+  padding: .15rem .3rem;
+  cursor: pointer;
+  max-width: 150px;
+  width: 100%;
+
+  &:focus { outline: 2px solid var(--azul-med); }
+}
+
 /* ── Results Table — Hierarchical ──────────────────────────── */
 .table-responsive { overflow-x: auto; }
 

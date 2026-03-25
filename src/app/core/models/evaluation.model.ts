@@ -14,6 +14,12 @@ export type NivelClinico =
   | 'moderado'
   | 'significativo';
 
+export interface EscalaItem {
+  label: string;
+  cls: string;    // CSS class for the badge colour
+  color: string;  // hex colour used in PDF/clone
+}
+
 export interface NivelInfo {
   label: string;
   emoji: string;
@@ -59,11 +65,13 @@ export interface SubmoduloEvalua {
   nombre: string;
   max: number;
   sujeto: number;
+  nivelManual?: string;  // directly-assigned level label
 }
 
 export interface AreaEvalua {
   cod: string;
   nombre: string;
+  nivelManual?: string;  // directly-assigned level label
   submodulos: SubmoduloEvalua[];
 }
 
@@ -84,6 +92,7 @@ export interface ExamenEvalua {
   observacionConducta: string;
   instrumentos: string[];
   areas: AreaEvalua[];
+  escala?: EscalaItem[];  // custom interpretation scale (falls back to DEFAULT_ESCALA)
   recomendacionesGenerales: string[];
   recomendacionesFamilia: string[];
   recomendacionesColegio: string[];

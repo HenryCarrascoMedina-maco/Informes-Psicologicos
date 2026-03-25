@@ -3,8 +3,8 @@ import {
   ViewChild, ElementRef, effect, AfterViewInit
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EvaluationService } from '../../../../core/services/evaluation.service';
-import { ExamenEvalua, AreaEvalua, isExamenEvalua } from '../../../../core/models/evaluation.model';
+import { EvaluationService, DEFAULT_ESCALA } from '../../../../core/services/evaluation.service';
+import { ExamenEvalua, AreaEvalua, EscalaItem, isExamenEvalua } from '../../../../core/models/evaluation.model';
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio',
   'julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -15,6 +15,7 @@ interface ComputedSubmodulo {
   max: number;
   sujeto: number;
   pct: number;
+  nivelManual?: string;
 }
 
 interface ComputedArea {
@@ -24,6 +25,7 @@ interface ComputedArea {
   totalMax: number;
   totalSujeto: number;
   pct: number;
+  nivelManual?: string;
   nivelInfo: { label: string; emoji: string; text: string; cls: string; color: string };
 }
 
@@ -51,6 +53,20 @@ export class InformeEvaluaComponent implements AfterViewInit {
     return ex && isExamenEvalua(ex) ? structuredClone(ex) as ExamenEvalua : null;
   });
 
+  // Editable interpretation scale — falls back to DEFAULT_ESCALA
+  escala = linkedSignal<EscalaItem[]>(() =>
+    structuredClone(this.examen()?.escala ?? DEFAULT_ESCALA)
+  );
+
+  // Resolved escala for template use
+  escalaActual = computed(() => this.escala());
+
+  // Returns the EscalaItem for a given label (or first one as fallback)
+  getEscalaItem(label: string | undefined): EscalaItem {
+    const esc = this.escala();
+    return esc.find(e => e.label === label) ?? esc[0];
+  }
+
   computedAreas = computed((): ComputedArea[] => {
     const ex = this.examen();
     if (!ex) return [];
@@ -61,6 +77,7 @@ export class InformeEvaluaComponent implements AfterViewInit {
       return {
         cod: a.cod,
         nombre: a.nombre,
+        nivelManual: a.nivelManual,
         totalMax,
         totalSujeto,
         pct,
@@ -68,6 +85,7 @@ export class InformeEvaluaComponent implements AfterViewInit {
         submodulos: a.submodulos.map(sub => ({
           ...sub,
           pct: sub.max > 0 ? Math.min(100, Math.round((sub.sujeto / sub.max) * 100)) : 0,
+          nivelManual: sub.nivelManual,
         })),
       };
     });
@@ -334,6 +352,64 @@ export class InformeEvaluaComponent implements AfterViewInit {
     });
   }
 
+  onAreaNivelChange(areaIndex: number, label: string): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map((a, ai) =>
+        ai === areaIndex ? { ...a, nivelManual: label || undefined } : a
+      );
+      return { ...ex, areas };
+    });
+  }
+
+  onSubNivelChange(areaIndex: number, subIndex: number, label: string): void {
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map((a, ai) =>
+        ai === areaIndex
+          ? { ...a, submodulos: a.submodulos.map((s, si) =>
+              si === subIndex ? { ...s, nivelManual: label || undefined } : s) }
+          : a
+      );
+      return { ...ex, areas };
+    });
+  }
+
+  onEscalaLabelChange(index: number, value: string): void {
+    const oldLabel = this.escala()[index]?.label;
+    this.escala.update(esc => esc.map((e, i) => i === index ? { ...e, label: value } : e));
+    // Also update any nivelManual references in areas/submodulos that used the old label
+    if (!oldLabel) return;
+    this.examen.update(ex => {
+      if (!ex) return null;
+      const areas = ex.areas.map(a => ({
+        ...a,
+        nivelManual: a.nivelManual === oldLabel ? value : a.nivelManual,
+        submodulos: a.submodulos.map(s => ({
+          ...s,
+          nivelManual: s.nivelManual === oldLabel ? value : s.nivelManual,
+        })),
+      }));
+      return { ...ex, areas };
+    });
+  }
+
+  resolvedNivel(nivelManual: string | undefined, pct: number): EscalaItem {
+    const esc = this.escala();
+    if (nivelManual) {
+      const found = esc.find(e => e.label === nivelManual);
+      if (found) return found;
+    }
+    // Fall back: pick by percentage position (index 0=best → last=worst)
+    const n = esc.length;
+    if (n === 0) return { label: '—', cls: '', color: '#888' };
+    const thresholds = [85, 70, 50]; // top 3 boundaries; beyond last bucket
+    for (let i = 0; i < Math.min(thresholds.length, n - 1); i++) {
+      if (pct >= thresholds[i]) return esc[i];
+    }
+    return esc[n - 1];
+  }
+
   onMotivoBlur(el: HTMLElement): void {
     this.examen.update(ex => ex ? { ...ex, motivoEvaluacion: el.innerText.trim() } : null);
   }
@@ -567,6 +643,19 @@ export class InformeEvaluaComponent implements AfterViewInit {
 
     clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
     clone.querySelectorAll('.fecha-display').forEach((el: Element) => (el as HTMLElement).style.borderBottom = 'none');
+    // Show PDF-only labels before stripping edit-only elements
+    clone.querySelectorAll<HTMLElement>('.escala-label-pdf').forEach(el => {
+      el.style.display = 'inline';
+    });
+    // Inline nivel badge colours from data attributes
+    clone.querySelectorAll<HTMLElement>('.nivel-badge').forEach(el => {
+      el.style.display      = 'inline-block';
+      el.style.padding      = '.25em .55em';
+      el.style.borderRadius = '20px';
+      el.style.fontWeight   = '700';
+      el.style.fontSize     = '.72rem';
+      el.style.whiteSpace   = 'nowrap';
+    });
     clone.querySelectorAll('.edit-hint,.no-pdf').forEach(el => el.remove());
     clone.querySelectorAll('.escala-card').forEach(el => el.remove());
     clone.querySelectorAll('.nombre-header-meta').forEach(el => el.remove());

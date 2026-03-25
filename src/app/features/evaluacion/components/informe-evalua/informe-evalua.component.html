@@ -155,12 +155,19 @@
   </div>
 
   <div class="escala-card">
-    <div class="escala-titulo">📊 ESCALA DE INTERPRETACIÓN (BASE CLÍNICA)</div>
+    <div class="escala-titulo">📊 ESCALA DE INTERPRETACIÓN (editable)</div>
     <div class="escala-filas">
-      <span class="escala-fila"><span class="nivel-badge nivel-adecuado">🟢 Desarrollo alto</span> 85% – 100%</span>
-      <span class="escala-fila"><span class="nivel-badge nivel-leve">🟡 Desarrollo promedio</span> 70% – 84%</span>
-      <span class="escala-fila"><span class="nivel-badge nivel-moderado">🟠 Desarrollo promedio bajo</span> 50% – 69%</span>
-      <span class="escala-fila"><span class="nivel-badge nivel-significativo">🔴 Desarrollo bajo</span> &lt;50%</span>
+      @for (item of escalaActual(); track $index; let ei = $index) {
+        <span class="escala-fila">
+          <span class="nivel-badge {{ item.cls }}">
+            <input type="text" class="escala-input-label no-pdf"
+                   [value]="item.label"
+                   (change)="onEscalaLabelChange(ei, $any($event.target).value)"
+                   title="Editar nombre del nivel" />
+            <span class="escala-label-pdf">{{ item.label }}</span>
+          </span>
+        </span>
+      }
     </div>
   </div>
 
@@ -191,7 +198,19 @@
             <td class="no-pdf">{{ a.totalSujeto }}</td>
             <td class="no-pdf td-pct"><strong>{{ a.pct }}%</strong></td>
             <td class="td-nivel">
-              <span class="nivel-badge {{ a.nivelInfo.cls }}">{{ a.nivelInfo.text }}</span>
+              <!-- edit mode: dropdown (hidden in PDF) -->
+              <select class="select-nivel no-pdf"
+                      [value]="a.nivelManual ?? ''"
+                      (change)="onAreaNivelChange(ai, $any($event.target).value)">
+                <option value="">— auto —</option>
+                @for (item of escalaActual(); track $index) {
+                  <option [value]="item.label">{{ item.label }}</option>
+                }
+              </select>
+              <!-- print/pdf badge -->
+              <span class="nivel-badge {{ resolvedNivel(a.nivelManual, a.pct).cls }} escala-label-pdf">
+                {{ resolvedNivel(a.nivelManual, a.pct).label }}
+              </span>
             </td>
             <td class="no-pdf td-delete">
               <button class="btn-agregar-sub" (click)="addSubmodulo(ai)" title="Agregar subárea">
@@ -221,7 +240,21 @@
                        (input)="onSubScoreChange(ai, si, $any($event.target).value)" />
               </td>
               <td class="no-pdf td-pct">{{ s.pct }}%</td>
-              <td class="td-sub-nivel">—</td>
+              <td class="td-sub-nivel">
+                <!-- edit mode: dropdown (hidden in PDF) -->
+                <select class="select-nivel no-pdf"
+                        [value]="s.nivelManual ?? ''"
+                        (change)="onSubNivelChange(ai, si, $any($event.target).value)">
+                  <option value="">— auto —</option>
+                  @for (item of escalaActual(); track $index) {
+                    <option [value]="item.label">{{ item.label }}</option>
+                  }
+                </select>
+                <!-- print/pdf badge -->
+                <span class="nivel-badge {{ resolvedNivel(s.nivelManual, s.pct).cls }} escala-label-pdf">
+                  {{ resolvedNivel(s.nivelManual, s.pct).label }}
+                </span>
+              </td>
               <td class="no-pdf td-delete">
                 <button class="btn-eliminar" (click)="removeSubmodulo(ai, si)" title="Eliminar subárea">
                   <i class="bi bi-trash"></i>
